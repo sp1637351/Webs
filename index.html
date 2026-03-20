@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium VIP Search</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            background: #111111; 
+            color: #FFD700; 
+            text-align: center; 
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            padding: 30px 20px;
+            border-radius: 15px;
+            border: 2px solid #DAA520;
+            box-shadow: 0 4px 15px rgba(218, 165, 32, 0.3);
+        }
+        
+        /* --- 🌧️ Rain/Drop Animation --- */
+        @keyframes dropRain {
+            0% { opacity: 0; transform: translateY(-40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .crown-icon { display: inline-block; animation: dropRain 0.8s ease forwards; opacity: 0; font-size: 35px; }
+        h2 { margin-top: 10px; color: #FFD700; text-transform: uppercase; letter-spacing: 2px; animation: dropRain 0.8s ease 0.4s forwards; opacity: 0; }
+        p.subtitle { color: #B8860B; font-size: 14px; margin-bottom: 25px; animation: dropRain 0.8s ease 0.8s forwards; opacity: 0; }
+
+        input { 
+            width: 90%; padding: 15px; margin-bottom: 20px; border-radius: 8px; 
+            border: 2px solid #DAA520; font-size: 16px; text-align: center; 
+            outline: none; background: #222; color: #FFF; box-sizing: border-box;
+            animation: dropRain 0.8s ease 1.2s forwards; opacity: 0;
+        }
+        input:focus { border-color: #FFDF00; box-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+        
+        button { 
+            background: linear-gradient(135deg, #DAA520, #FFD700); color: #000; 
+            border: none; padding: 15px 25px; font-size: 16px; border-radius: 8px; 
+            cursor: pointer; font-weight: bold; width: 90%; text-transform: uppercase;
+            letter-spacing: 1px; transition: transform 0.2s;
+            animation: dropRain 0.8s ease 1.4s forwards; opacity: 0;
+        }
+        button:hover { transform: scale(1.05); }
+        button:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; border: none; }
+
+        /* --- ⏳ Loading Animation --- */
+        #loadingBox { margin-top: 25px; display: none; font-size: 18px; color: #FFD700; font-weight: bold; }
+        @keyframes spinHourglass {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hourglass { display: inline-block; font-size: 35px; animation: spinHourglass 1.5s infinite linear; margin-bottom: 10px; }
+
+        /* --- 📜 Data Slide Down Animation --- */
+        @keyframes slideDownData {
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        #resultBox { 
+            margin-top: 25px; text-align: left; background: #222; 
+            padding: 20px; border-radius: 10px; display: none; 
+            white-space: pre-wrap; line-height: 1.6; font-size: 15px; 
+            border: 1px solid #DAA520; color: #FFF;
+        }
+        .gold-text { color: #FFD700; font-weight: bold; }
+
+        /* --- ⭐ Footer Credit --- */
+        .footer {
+            margin-top: 35px; font-size: 16px; color: #FFD700; font-weight: bold;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+            animation: dropRain 1s ease 1.8s forwards; opacity: 0; letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="crown-icon">👑</div>
+        <h2>VIP Search</h2>
+        <p class="subtitle">Premium Database Access</p>
+        
+        <input type="text" id="phone" placeholder="Enter Number (e.g. 9931452524)">
+        <button id="searchBtn" onclick="startSearch()">🔍 Search</button>
+
+        <div id="loadingBox">
+            <div class="hourglass">⏳</div><br>
+            Searching Premium Data... <span id="timer" style="color: #FFF; font-size: 22px;">5</span>
+        </div>
+
+        <div id="resultBox"></div>
+
+        <div class="footer">⭐⭐ Credit by Mr. Shashank Pandey ⭐⭐</div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // 🗄️ Full 44 Database Entries
+        const database = {
+            "+919931452524": "👤 **Name:** Mrityunjay Kumar Pandey\n👨‍👦 **Father's Name:** Ramadhar Pandey\n📧 **Email:** `pandeymrityunjay51@gmail.com`\n🏠 **Address:** S/O Ramadhar Pandey, ward no 13, khairatiya, Betia Dih, West Champaran, Bettiah Dih, Chanpatia, Bihar 845438\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar/ID:** `321978140406`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917255019434": "👤 **Name:** MR DEVNATH YADAV\n👨‍👦 **Father's Name:** Vindyachal Yadav\n🏠 **Address:** VINDYACHAL YADAV KHAIRATIYA KHAIRATIYA BETTIAH WEST CHAMPARAN BIHAR 845438\n📶 **Circle:** BIHAR VODAFONE\n🪪 **ID Number:** `388906312842`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919234418072": "👤 **Name:** SURAJ YADAV\n👨‍👦 **Father's Name:** DEVNATH YADAV\n📧 **Email:** `skpt856@gmail.com`\n🏠 **Address:** S/O: Devnath Yadav. khairatia. VTC: Betia Dih, PO: Bettiah Dih, Sub District: Chanpatia, District: West Champaran, State: Bihar, PIN Code: 845438\n🪪 **ID Number:** `6184 8707 3968`\n📸 **Instagram ID:** `suru.jjj_j`\n👻 **Snapchat ID:** `surajj44`",
+            "+919279838115": "👤 **Name:** MANJAY YADAV\n👨‍👦 **Father's Name:** MANOJ YADAV\n📧 **Email:** `88630mykumar@gmail.com`\n🏠 **Address:** S/O: MANOJ YADAV, khairatia, Bettiah Dih, West Champaran, State: Bihar, PIN Code: 845438\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919708053421": "👤 **Name:** MR. SHASHANK PANDEY\n👨‍👦 **Father's Name:** MRITYUNJAY KUMAR PANDEY\n📧 **Email:** `sp1637351@gmail.com`\n🏠 **Address:** S/O: Mrityunjay Kumar Pandey, khairitiya, VTC: Betia Dih, PO: Bettiah Dih, Sub District: Chanpatia, District: West Champaran, State: Bihar, PIN Code: 845438\n📸 **Instagram ID:** `mrshashankpandey`\n👻 **Snapchat ID:** `shashank845438`",
+            "+918084410430": "👤 **Name:** Yogesh Kumar Mishra\n👨‍👦 **Father's Name:** Baleshvar Mishra\n🏠 **Address:** S/O Baleshvar Mishra ward no-07 piparpati Piparpanti West Champaran Bihar 845452\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `668889548467`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919631259911": "👤 **Name:** Pawan Kumar\n👨‍👦 **Father's Name:** Ramadhar Pandey\n🏠 **Address:** S/O Ramadhar Pandey khairatiya ward 13 Betia Dih West Champaran Bettiah Dih Chanpatia Bihar 845438\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `565218509028`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917762965065": "👤 **Name:** Sanjeev Kumar Jha\n👨‍👦 **Father's Name:** Anjani Kumar Jha\n🏠 **Address:** S/O Anjani Kumar Jha ojha tola JABDOUL ward NO 13 Jabdaul West Champaran Bihar 845450\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `804508112223`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919939419521": "👤 **Name:** Prashant Kumar Jha\n👨‍👦 **Father's Name:** Harendra Jha\n🏠 **Address:** S/O Harendra Jha dhurwa math Betia Dih West Champaran Bihar 845438\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `547103404994`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917546916758": "👤 **Name:** Asim Iqbal\n👨‍👦 **Father's Name:** Asgar Ali\n🏠 **Address:** Ward no-13 Mainatand PO Basantpur Mainatanr West Champaran West Champaran Bihar 845306\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `399067916732`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919199046745": "👤 **Name:** Ram Ekbal Pandey\n👨‍👦 **Father's Name:** byas pandey\n🏠 **Address:** s/o byas pandey khairatiya ward 13 Bettiah Dih khairatiya ward 13 betia dih bettiah dih Chanpatia west champaran Bihar 845438\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `885671620038`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+918789619122": "👤 **Name:** Navnit Kumar\n👨‍👦 **Father's Name:** Umeshwar Tiwari\n🏠 **Address:** S/O Umeshwar Tiwari khairtiya Betia Dih West Champaran Bihar 845438\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `371948578273`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+916203165211": "👤 **Name:** Gajendra sharma\n👨‍👦 **Father's Name:** Heera sharma\n🏠 **Address:** . .Jhakhra . . west Champaran West Champaran Bihar 845307\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `884941571024`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917250227785": "👤 **Name:** Chanda Devi\n👨‍👦 **Father's Name:** Suresh Yadav\n🏠 **Address:** W/O Suresh Yadav ward no 13 khairatiya Betia Dih West Champaran Bihar 845438\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** No Information\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+918292444681": "👤 **Name:** Chandrabhushan Pandey\n👨‍👦 **Father's Name:** Lakshman Pandey\n🏠 **Address:** W Champaran BHR 845438\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** No Information\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919507276070": "👤 **Name:** Jayram Kumar\n👨‍👦 **Father's Name:** Suresh Patel\n🏠 **Address:** S/O Suresh Patel khairatiya(indra nagar) ward no 14 Betia Dih West Champaran Bihar 845438\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** No Information\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919661096759": "👤 **Name:** Badashah Dubey\n👨‍👦 **Father's Name:** Nageshwar Dubey\n🏠 **Address:** H No 59 Viil DK Shikarpur Po DK shikarpur W Champaran 845451\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** No Information\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919693377142": "👤 **Name:** Ramnaresh Tiwari\n👨‍👦 **Father's Name:** Vishwanath Tiwari\n🏠 **Address:** S/O Vishwanath Tiwari Sariswa Bazar NA bharwaliya Siriswa Majhaulia West Champaran NA Bihar 845454\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `300326248182`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917256806787": "👤 **Name:** Raj Kumar Yadav\n👨‍👦 **Father's Name:** Bhola Yadav\n🏠 **Address:** S/O Bhola Yadav khairtiya Bettiah Dih Betia Dih Chanpatia West Champaran Bihar 845438\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `451607596687`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917061386347": "👤 **Name:** Deepak Kumar Mishra\n👨‍👦 **Father's Name:** Baleshwar Mishra\n🏠 **Address:** S/O Baleshwar Mishra ward no 07 PIPARPANTI NA Piparpanti Jogapatti West Champaran NA Bihar 845452\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `950856755378`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919135811086": "👤 **Name:** SURESH YADAV\n👨‍👦 **Father's Name:** PRAYAG YADAV\n🏠 **Address:** W CHAMPARAN WEST CHAMPARAN WEST CHAMPARAN Bihar 845102\n📶 **Circle:** VODA BHR&JHR\n🪪 **Aadhar:** `724787692213`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919693739823": "👤 **Name:** Rampukari Devi\n👨‍👦 **Father's Name:** Vidhyanand Chaubey\n🏠 **Address:** W/O Vidhyanand Chaubey Behari Bankatwa NA po-dukhichhapar Tola Gularia Sikta West Champaran NA Bihar 845307\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `287757791616`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919006010944": "👤 **Name:** Surendra Chaubey\n👨‍👦 **Father's Name:** fulena choube\n🏠 **Address:** 12 post dukhi chapar tola gularia Gulriya Gulriya Gulriy Bettiah West Champaran Bihar 845307\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `907407466854`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917667049681": "👤 **Name:** Ranjita Kumari\n👨‍👦 **Father's Name:** shankar sah\n🏠 **Address:** d/o shankar sah Mainatand vill-nakchhed bahuarawa post-marjadawa mainatand bahuarwa Mainatanr west champaran Bihar 845306\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `895752204636`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917294934686": "👤 **Name:** Santosh Prasad\n👨‍👦 **Father's Name:** Vinda Prasad\n🏠 **Address:** S/O Vinda Prasad khairatiya(indra nagar) ward no 14 Betia Dih West Champaran Bihar 845438\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** No Information\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+918825243313": "👤 **Name:** Murari Kumar\n👨‍👦 **Father's Name:** Jangali Thakur\n🏠 **Address:** S/O Jangali Thakur dhurawa math Betia Dih West Champaran Bihar 845438\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `338243683072`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+916209154989": "👤 **Name:** ALOK KUMAR\n👨‍👦 **Father's Name:** SURESH PRASAD\n🏠 **Address:** khairtiya Betia Dih khairtiya Betia Dih khairtiya Betia Dih AHWAR SHEK-PASHCHIM CHAMPARAN PASHCHIM CHAMPARAN 845438 BR\n📶 **Circle:** BIHAR VODAFONE\n🪪 **Aadhar:** `364970372747`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919523502586": "👤 **Name:** Sri Kanti Devi\n👨‍👦 **Father's Name:** Kanhaiya Mishra\n🏠 **Address:** village gola pakariya Post Majirwa Chiraia East Champaran Bhelwa Circle Chiraian Bihar 845315\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `308383544232`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919939744439": "👤 **Name:** Bhagwat Tiwari\n👨‍👦 **Father's Name:** Mukund Tiwari\n🏠 **Address:** S/O Mukund Tiwari gauchari tola sukhpur Ghorcharhi West Champaran Sikta Sikta Bihar 845307\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `829261008584`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919708976912": "👤 **Name:** AJEET KUMARDUBEY\n👨‍👦 **Father's Name:** UMA SHANKAR DUBEY\n🏠 **Address:** Sirsia Sirsia Sirsia Sirsia Sirisa West Champaran BIHAR 845450\n📶 **Circle:** BIHAR BSNL\n🪪 **Aadhar:** `276448868583`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919264134453": "👤 **Name:** Viku Kumar\n👨‍👦 **Father's Name:** laxman pandey\n🏠 **Address:** s/o laxman pandey gopalpur Baisakhwa sikta gopalpur west champaran Bihar 845307\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `668779281854`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919939637495": "👤 **Name:** Raj Kishor Sharma\n👨‍👦 **Father's Name:** Bharat Thakur\n🏠 **Address:** 36 Lohriya Tola Vill Lohiyariya Anchal Chanpatiya P Champaran Bihar 845450\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `Kjz4364618`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919905833925": "👤 **Name:** Saroj Devi\n👨‍👦 **Father's Name:** Tunna kumar rao\n🏠 **Address:** ward 04 dukhichhapar sargatia sargatia Sikta West Champaran Bihar 845307\n📶 **Circle:** JIO BHR&JHR\n🪪 **Aadhar:** `940570376485`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+918544523577": "👤 **Name:** Manoj Kumar Pandey\n👨‍👦 **Father's Name:** S/O: Kailash Pandey\n🏠 **Address:** yadochhapar ward no. 12 post-yadochhapar Lohiaria Chanpatia West Champaran Bihar 845450\n📶 **Circle:** BIHAR BSNL\n🪪 **Aadhar:** `393010833245`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919934924844": "👤 **Name:** Brij Bhushan Prasad\n👨‍👦 **Father's Name:** Angad Prasad\n🏠 **Address:** S/O Angad Prasad avraiya shiu tola Post avraiya Tiwari tola Auraia ward no 09 West Champaran Bihar 845450\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `939885049843`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919801453190": "👤 **Name:** Sandeep Kumar Verma\n👨‍👦 **Father's Name:** Om Prakash Verma\n🏠 **Address:** H No 4 Vill Avariya W Champaran Anchal Chanpatiya\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** No Information\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919801674330": "👤 **Name:** Rajiv Kumar\n👨‍👦 **Father's Name:** Bishwnath Prasad\n🏠 **Address:** S/O Bishwnath Prasad ward no 02 prasauna Bakulahar West Champaran Bihar 845449\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `466098919721`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+918507649533": "👤 **Name:** Rishi Kumar Pandey\n👨‍👦 **Father's Name:** Harendra Pandey\n🏠 **Address:** S/O Harendra Pandey 14 jaitiya Jaitia NA Jaitiya Chanpatia West Champaran NA Bihar 845449\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `833056215231`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+917654679124": "👤 **Name:** Dhananjaytiwari\n👨‍👦 **Father's Name:** late paras nath tiwari\n🏠 **Address:** - WARD NO-17 BETTIAH Bettiah KOTWALI CHOWKganj no01 Bettiah Bettiah West Champaran Bihar 845438\n📶 **Circle:** BIHAR JIO\n🪪 **Aadhar:** `507732455254`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919006976342": "👤 **Name:** Kalawati Devi\n👨‍👦 **Father's Name:** Lali Khatik\n🏠 **Address:** WARD NUMBER -13 SHASTRI NAGAR Bagaha 1 Bagaha Pashchim Champaran West Champaran West Champaran Bihar 845101\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `443204994530`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919939687032": "👤 **Name:** Lalababu Sah\n👨‍👦 **Father's Name:** Chaudhari Sah\n🏠 **Address:** 65 Town/Vill Betiya Dih Anchal Chanpatiya W Champaran\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** No Information\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919955499197": "👤 **Name:** Chunu Kumar\n👨‍👦 **Father's Name:** Dhanesh Chobey\n🏠 **Address:** 23 behra SIKTA BEHRA TOLA GULARIA BEHARI BANKATWA Tola Gularia Behari Bankatwa Sikta West Champaran West Champaran Bihar 845307\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `427817480829`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+919546420107": "👤 **Name:** Vinay Mishra\n👨‍👦 **Father's Name:** Amla Mishra\n🏠 **Address:** S/O Amla Mishra Belwa Ward No 05 Belwa Bandobasti West Champaran Bihar 845450\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `435143346320`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information",
+            "+918935930315": "👤 **Name:** Vikash Chobey\n👨‍👦 **Father's Name:** Dhanesh Chobey\n🏠 **Address:** . . .behari bankatwa p o dhukhichhapar West Champaran Bihar 845307\n📶 **Circle:** AIRTEL BHR&JHR\n🪪 **Aadhar:** `887317897573`\n📸 **Instagram ID:** No Information\n👻 **Snapchat ID:** No Information"
+        };
+
+        let countdownTimer;
+
+        function startSearch() {
+            let phoneInput = document.getElementById("phone");
+            let searchBtn = document.getElementById("searchBtn");
+            
+            let phone = phoneInput.value.replace(/ /g, "").trim();
+            let resultDiv = document.getElementById("resultBox");
+            let loadingBox = document.getElementById("loadingBox");
+            let timerSpan = document.getElementById("timer";
+
+            // Auto formatting
+            if (!phone.startsWith("+91") && phone.length === 10) {
+                phone = "+91" + phone;
+            } else if (!phone.startsWith("+") && phone.length > 10) {
+                phone = "+" + phone;
+            }
+
+            if (!phone) {
+                resultDiv.style.display = "block";
+                resultDiv.style.animation = "slideDownData 0.5s ease-out";
+                resultDiv.innerHTML = "<span style='color: #FF6347;'>❌ Please enter a mobile number!</span>";
+                return;
+            }
+
+            // ⚠️ SEARCH LOCK: Disable Input and Button so user cannot search again
+            phoneInput.disabled = true;
+            searchBtn.disabled = true;
+            searchBtn.innerText = "🔒 Trial Used";
+
+            // Hide previous result & Show Loading Box
+            resultDiv.style.display = "none";
+            loadingBox.style.display = "block";
+            
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            let timeLeft = 5;
+            timerSpan.innerText = timeLeft;
+
+            countdownTimer = setInterval(function() {
+                timeLeft--;
+                timerSpan.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    showData(phone);
+                }
+            }, 1000);
+        }
+
+        function showData(phone) {
+            let loadingBox = document.getElementById("loadingBox");
+            let resultDiv = document.getElementById("resultBox");
+
+            loadingBox.style.display = "none"; 
+            
+            resultDiv.style.display = "block";
+            resultDiv.style.animation = "none"; 
+            setTimeout(() => resultDiv.style.animation = "slideDownData 0.6s ease-out", 10); 
+            
+            let baseHTML = "";
+            if (database[phone]) {
+                let rawText = database[phone];
+                let formattedText = rawText.replace(/\*\*(.*?)\*\*/g, "<span class='gold-text'>$1</span>").replace(/`/g, "");
+                baseHTML = "<span style='color: #00FF00;'>✅ Data Found:</span><br><br>" + formattedText.replace(/\n/g, '<br><br>');
+            } else {
+                baseHTML = "<span style='color: #FF6347;'>❌ Number not found in database.</span>";
+            }
+
+            // ⚠️ AUTO-CLOSE & SAVE TRIAL LOGIC
+            let readTime = 20; // User gets 20 seconds to read the data
+            let closingMsg = `
+                <br><br><hr style="border-color:#DAA520; opacity: 0.5;">
+                <div style="text-align:center; color:#FF6347; font-size:14px; margin-top:10px; font-weight:bold;">
+                    ⏳ ऐप <span id="closeTime">${readTime}</span> सेकंड में बंद हो जाएगा और आपका 1 फ्री ट्रायल खत्म हो जाएगा...
+                </div>
+            `;
+            
+            resultDiv.innerHTML = baseHTML + closingMsg;
+
+            let closeInterval = setInterval(() => {
+                readTime--;
+                let ctElem = document.getElementById("closeTime");
+                if (ctElem) ctElem.innerText = readTime;
+
+                if (readTime <= 0) {
+                    clearInterval(closeInterval);
+                    // 🚀 This specific command sends data to your Python bot AND closes the web app!
+                    tg.sendData(phone); 
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
